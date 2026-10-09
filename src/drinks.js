@@ -37,11 +37,45 @@ export function getLingo(drink) {
   ].filter(Boolean).join(' ');
 }
 
+const MILK_RECIPE = { condensed: 'condensed milk', evaporated: 'evaporated milk', none: 'no milk' };
+const SUGAR_RECIPE = {
+  no_sugar: 'no sugar', less_less: 'very little sugar', less: 'less sugar', normal: 'normal sugar', more: 'extra sugar',
+};
+const INTENSITY_RECIPE = { less: 'weak brew', more: 'strong brew' };
+
 export function describeDrink(drink) {
-  if (drink.base === 'Coffee + Tea') return 'A friendly mash-up — coffee married to tea.';
   const temp = drink.temp === 'iced' ? 'on ice' : 'piping hot';
-  return `${drink.base} ${temp}, ${milkLabel(drink.milk).toLowerCase()} milk, ${sugarLabel(drink.sugar).toLowerCase()} sugar.`;
+  return [
+    `${drink.base} ${temp}`,
+    MILK_RECIPE[drink.milk],
+    INTENSITY_RECIPE[drink.intensity], // normal strength needs no mention
+    SUGAR_RECIPE[drink.sugar],
+  ].filter(Boolean).join(', ') + '.';
 }
+
+// Shareable URL state: ?base=Tea&temp=iced&... Unknown/invalid values fall back to defaults.
+const FIELD_OPTIONS = { base: BASES, temp: TEMPS, milk: MILKS, sugar: SUGARS, intensity: INTENSITIES };
+
+export function decodeDrink(search) {
+  const params = new URLSearchParams(search);
+  const drink = { ...DEFAULT_DRINK };
+  for (const [field, options] of Object.entries(FIELD_OPTIONS)) {
+    const v = params.get(field);
+    if (options.includes(v)) drink[field] = v;
+  }
+  return drink;
+}
+
+export function encodeDrink(drink) {
+  const params = new URLSearchParams();
+  for (const field of Object.keys(FIELD_OPTIONS)) {
+    if (drink[field] !== DEFAULT_DRINK[field]) params.set(field, drink[field]);
+  }
+  const q = params.toString();
+  return q ? `?${q}` : '';
+}
+
+export const sameDrink = (a, b) => Object.keys(FIELD_OPTIONS).every(f => a[f] === b[f]);
 
 // Every combination, grouped by base. Built once so the objects are stable
 // between renders (lets memoised DrinkSketch skip re-rendering the menu).
@@ -59,11 +93,13 @@ export const TOTAL_COMBINATIONS = BASES.reduce((n, b) => n + DRINKS_BY_BASE[b].l
 export const PHRASES = [
   { word: 'Kopi', mean: 'Coffee with condensed milk', short: 'Coffee w/ condensed milk', tone: 'orange' },
   { word: 'Teh', mean: 'Tea with condensed milk', short: 'Tea w/ condensed milk', tone: 'leaf' },
+  { word: 'Yuan Yang', mean: 'Coffee and tea mixed', short: 'Coffee + tea mix', tone: 'orange' },
   { word: 'C', mean: 'Evaporated milk instead', short: 'Evaporated milk', tone: 'ink' },
   { word: 'O', mean: 'No milk at all', short: 'No milk', tone: 'ink' },
   { word: 'Bing', mean: 'On ice', short: 'On ice', tone: 'ink' },
   { word: 'Kosong', mean: 'Zero sugar', short: 'Zero sugar', tone: 'ink' },
   { word: 'Siu Dai', mean: 'Less sugar', short: 'Less sugar', tone: 'ink' },
+  { word: 'Siu Siu Dai', mean: 'Even less sugar', short: 'Even less sugar', tone: 'ink' },
   { word: 'Ga Dai', mean: 'Extra sugar', short: 'Extra sugar', tone: 'orange' },
   { word: 'Di Lo', mean: 'Strong, kao kao', short: 'Strong, kao kao', tone: 'ink' },
   { word: 'Po', mean: 'Weak, more water', short: 'Weak, more water', tone: 'ink' },

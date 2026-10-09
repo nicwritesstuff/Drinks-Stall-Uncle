@@ -1,11 +1,10 @@
 /* ============ DESKTOP VIEW ============ */
 import DrinkSketch from '../components/DrinkSketch.jsx';
-import { Chip, GroupLabel, HandArrow, LingoWords } from '../components/controls.jsx';
+import { Chip, GroupLabel, HandArrow, LingoWords, SpeakButton } from '../components/controls.jsx';
 import {
   BASES, TEMPS, MILKS, SUGARS, INTENSITIES, DEFAULT_DRINK, DRINKS_BY_BASE, PHRASES, TOTAL_COMBINATIONS,
   getLingo, describeDrink, sugarLabel, intensityLabel, milkLabel, tempLabel,
 } from '../drinks.js';
-import { speakLingo } from '../speech.js';
 
 const TONE_COLORS = { orange: 'var(--orange-deep)', leaf: 'var(--leaf)', ink: 'var(--ink)' };
 const BASE_TILT = { 'Coffee': -1.4, 'Tea': 0.6, 'Coffee + Tea': -0.4 };
@@ -63,7 +62,7 @@ export default function DesktopView({ selection, pick, setSelection, activeTable
 
         <section className="card card-dark" style={{ transform: 'rotate(0.6deg)', display: 'flex', flexDirection: 'column', height: '100%' }}>
           <div className="tape" style={{ top: -16, left: '50%', transform: 'translateX(-50%) rotate(-2deg)', background: 'rgba(251,246,233,0.6)' }}></div>
-          <div className="small-cap" style={{ color: 'rgba(251,246,233,0.5)', marginBottom: 10 }}>The Order &nbsp;·&nbsp; serving #001</div>
+          <div className="small-cap" style={{ color: 'rgba(251,246,233,0.5)', marginBottom: 10 }}>The Order </div>
           <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', marginTop: 8, marginBottom: 18 }}>
             <div style={{ position: 'relative' }}>
               <DrinkSketch drink={selection} size="lg" />
@@ -84,7 +83,9 @@ export default function DesktopView({ selection, pick, setSelection, activeTable
           <div style={{ textAlign: 'center', marginTop: 6 }}>
             <div className="small-cap" style={{ color: 'rgba(251,246,233,0.5)', marginBottom: 6 }}>Say this to uncle ↓</div>
             <LingoWords lingo={lingo} as="h2" className="lingo" wordClassName="word" stepMs={60} />
-            <button type="button" className="speak-btn" onClick={() => speakLingo(lingo)} style={{ marginTop: 18 }}>🔊 hear it</button>
+            <div style={{ marginTop: 18 }}>
+              <SpeakButton lingo={lingo} className="speak-btn" idleLabel="🔊 hear it" playingLabel="🔊 playing…" />
+            </div>
           </div>
           <div style={{ marginTop: 24, paddingTop: 22, borderTop: '1.5px dashed rgba(251,246,233,0.25)' }}>
             <div className="small-cap" style={{ color: 'rgba(251,246,233,0.5)', marginBottom: 8 }}>Recipe</div>

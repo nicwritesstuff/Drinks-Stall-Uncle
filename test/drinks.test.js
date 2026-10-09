@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { getLingo, describeDrink, DRINKS_BY_BASE, TOTAL_COMBINATIONS, DEFAULT_DRINK } from '../src/drinks.js';
+import { getLingo, describeDrink, DRINKS_BY_BASE, TOTAL_COMBINATIONS, DEFAULT_DRINK, PHRASES, encodeDrink, decodeDrink } from '../src/drinks.js';
 import { toPhonetic } from '../src/speech.js';
 
 test('default order is plain kopi', () => {
@@ -27,7 +27,31 @@ test('menu has 270 distinct combinations with unique names', () => {
 
 test('describeDrink', () => {
   assert.equal(describeDrink(DEFAULT_DRINK), 'Coffee piping hot, condensed milk, normal sugar.');
-  assert.equal(describeDrink({ ...DEFAULT_DRINK, base: 'Coffee + Tea' }), 'A friendly mash-up — coffee married to tea.');
+  assert.equal(
+    describeDrink({ ...DEFAULT_DRINK, base: 'Tea', milk: 'none', sugar: 'no_sugar' }),
+    'Tea piping hot, no milk, no sugar.',
+  );
+  assert.equal(describeDrink({ ...DEFAULT_DRINK, sugar: 'less_less' }), 'Coffee piping hot, condensed milk, very little sugar.');
+  assert.equal(
+    describeDrink({ base: 'Coffee + Tea', temp: 'iced', milk: 'evaporated', sugar: 'more', intensity: 'more' }),
+    'Coffee + Tea on ice, evaporated milk, strong brew, extra sugar.',
+  );
+});
+
+test('every lingo token is explained in the phrase decoder', () => {
+  const words = PHRASES.map(p => p.word.toLowerCase());
+  for (const drink of Object.values(DRINKS_BY_BASE).flat()) {
+    let rest = getLingo(drink).toLowerCase();
+    for (const w of [...words].sort((a, b) => b.length - a.length)) rest = rest.replace(new RegExp(`\\b${w}\\b`), '');
+    assert.equal(rest.trim(), '', getLingo(drink));
+  }
+});
+
+test('drink round-trips through the URL', () => {
+  assert.equal(encodeDrink(DEFAULT_DRINK), '');
+  const d = { base: 'Coffee + Tea', temp: 'iced', milk: 'none', sugar: 'less_less', intensity: 'more' };
+  assert.deepEqual(decodeDrink(encodeDrink(d)), d);
+  assert.deepEqual(decodeDrink('?base=Bogus&temp=iced'), { ...DEFAULT_DRINK, temp: 'iced' });
 });
 
 test('phonetics replace longest phrase first', () => {

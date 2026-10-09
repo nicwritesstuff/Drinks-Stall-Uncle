@@ -7,12 +7,11 @@
  *   Bottom strip — Sugar (5 options, easier as one row)
  */
 import DrinkSketch from '../components/DrinkSketch.jsx';
-import { DialButton, SideLabel, LingoWords } from '../components/controls.jsx';
+import { DialButton, SideLabel, LingoWords, SpeakButton } from '../components/controls.jsx';
 import {
   BASES, TEMPS, MILKS, SUGARS, INTENSITIES, DRINKS_BY_BASE, PHRASES, TOTAL_COMBINATIONS,
-  getLingo, sugarLabel, intensityLabel, milkLabel, tempLabel,
+  getLingo, describeDrink, sugarLabel, intensityLabel, milkLabel, tempLabel,
 } from '../drinks.js';
-import { speakLingo } from '../speech.js';
 
 export default function MobileView({ selection, pick, setSelection, activeTable, toggleTable }) {
   const lingo = getLingo(selection);
@@ -38,8 +37,10 @@ export default function MobileView({ selection, pick, setSelection, activeTable,
             <DrinkSketch drink={selection} size="sm" />
           </div>
           <div className="c-small-cap" style={{ marginBottom: 1 }}>say to uncle ↓</div>
-          <LingoWords lingo={lingo} as="h3" className="c-lingo" wordClassName="c-word" stepMs={50} />
-          <button type="button" className="c-speak-mini" onClick={() => speakLingo(lingo)}>🔊 hear</button>
+          <LingoWords lingo={lingo} as="h2" className="c-lingo" wordClassName="c-word" stepMs={50} />
+          <SpeakButton lingo={lingo} className="c-speak-mini" idleLabel="🔊 hear" playingLabel="🔊 playing…" />
+          <div className="c-small-cap" style={{ marginTop: 4 }}>Recipe</div>
+          <div className="c-recipe-line">{describeDrink(selection)}</div>
         </div>
 
         <div className="c-side">
@@ -65,7 +66,7 @@ export default function MobileView({ selection, pick, setSelection, activeTable,
       </div>
 
       <div className="c-section-divider"></div>
-      <h3 className="c-section-h">The phrase decoder</h3>
+      <h2 className="c-section-h">The phrase decoder</h2>
       <p className="c-section-sub">little words that change everything</p>
       <div className="c-decoder-grid">
         {PHRASES.map(p => (
@@ -77,7 +78,7 @@ export default function MobileView({ selection, pick, setSelection, activeTable,
       </div>
 
       <div className="c-section-divider"></div>
-      <h3 className="c-section-h">The whole menu</h3>
+      <h2 className="c-section-h">The whole menu</h2>
       <p className="c-section-sub">all {TOTAL_COMBINATIONS} combinations — pick a base</p>
       <div className="c-menu-tabs">
         {BASES.map(b => (
