@@ -16,13 +16,28 @@ export function toPhonetic(text) {
   return PHONETIC_RULES.reduce((out, [re, sound]) => out.replace(re, sound), text.toLowerCase());
 }
 
-export function speakLingo(text) {
-  const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
-  if (!synth || typeof SpeechSynthesisUtterance === 'undefined') return;
+const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
+export const speechSupported = !!synth && typeof SpeechSynthesisUtterance !== 'undefined';
+
+// Browsers load voices asynchronously: getVoices() is often empty until
+// `voiceschanged` fires, so cache them as soon as they arrive.
+let sgVoice;
+function refreshVoice() {
+  sgVoice = synth.getVoices().find(v => v.lang.includes('SG') || v.name.includes('Singapore'));
+}
+if (speechSupported) {
+  refreshVoice();
+  synth.addEventListener?.('voiceschanged', refreshVoice);
+}
+
+// `onEnd` fires exactly once, whether speech finishes, errors or is cancelled.
+export function speakLingo(text, onEnd) {
+  if (!speechSupported) return;
   synth.cancel();
+  if (!sgVoice) refreshVoice();
   const u = new SpeechSynthesisUtterance(toPhonetic(text));
-  const sg = synth.getVoices().find(v => v.lang.includes('SG') || v.name.includes('Singapore'));
-  if (sg) u.voice = sg;
+  if (sgVoice) u.voice = sgVoice;
   u.rate = 0.85;
+  u.onend = u.onerror = () => onEnd?.();
   synth.speak(u);
 }

@@ -206,6 +206,7 @@ body {
   box-shadow: 3px 3px 0 rgba(0,0,0,0.4); transition: transform 100ms;
 }
 .speak-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 rgba(0,0,0,0.4); }
+.speak-btn:disabled, .c-speak-mini:disabled { opacity: 0.6; cursor: default; transform: none; }
 .speak-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.4); }
 .small-cap {
   font-family: "Inter", sans-serif; font-weight: 700; font-size: 11px;
@@ -219,7 +220,7 @@ body {
 
 /* Order lingo words (desktop) */
 .lingo .word {
-  margin-right: 12px; color: var(--cream);
+  color: var(--cream);
   animation: pop 360ms cubic-bezier(0.34,1.56,0.64,1) backwards;
 }
 .lingo .word.is-first { color: var(--orange); }
@@ -413,7 +414,7 @@ button:focus-visible { outline: 3px solid var(--orange-deep); outline-offset: 3p
 }
 
 .c-lingo .c-word {
-  display: inline-block; margin-right: 4px; color: #FBF6E9;
+  display: inline-block; color: #FBF6E9;
   animation: cpop 320ms cubic-bezier(0.34,1.56,0.64,1) backwards;
 }
 .c-lingo .c-word.is-first { color: #D97757; }
@@ -421,4 +422,9 @@ button:focus-visible { outline: 3px solid var(--orange-deep); outline-offset: 3p
 @keyframes cpop {
   0% { opacity: 0; transform: translateY(6px) scale(0.92); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.c-recipe-line {
+  font-family: Kalam, cursive; font-size: 11px; line-height: 1.3;
+  color: #FBF6E9; opacity: 0.9; text-align: center; padding: 0 2px;
 }

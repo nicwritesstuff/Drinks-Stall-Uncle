@@ -1,4 +1,19 @@
 /* ============ SHARED CONTROLS ============ */
+import { Fragment, useState } from 'react';
+import { speakLingo, speechSupported } from '../speech.js';
+
+// Speaks the order; shows a disabled "playing" state until speech ends.
+// Renders nothing where speech synthesis is unavailable.
+export function SpeakButton({ lingo, className, idleLabel, playingLabel }) {
+  const [playing, setPlaying] = useState(false);
+  if (!speechSupported) return null;
+  return (
+    <button type="button" className={className} disabled={playing} aria-busy={playing}
+      onClick={() => { setPlaying(true); speakLingo(lingo, () => setPlaying(false)); }}>
+      {playing ? playingLabel : idleLabel}
+    </button>
+  );
+}
 
 // Toggle buttons report their state to assistive tech via aria-pressed.
 export function Chip({ active, onClick, children }) {
@@ -48,11 +63,13 @@ export function LingoWords({ lingo, as: Tag, className, wordClassName, stepMs })
   return (
     <Tag className={className} key={lingo} aria-live="polite">
       {lingo.split(' ').map((word, i) => (
-        <span
-          key={i}
-          className={`${wordClassName} ${i === 0 ? 'is-first' : ''}`}
-          style={{ animationDelay: `${i * stepMs}ms` }}
-        >{word}</span>
+        <Fragment key={i}>
+          {i > 0 && ' '}
+          <span
+            className={`${wordClassName} ${i === 0 ? 'is-first' : ''}`}
+            style={{ animationDelay: `${i * stepMs}ms` }}
+          >{word}</span>
+        </Fragment>
       ))}
     </Tag>
   );
